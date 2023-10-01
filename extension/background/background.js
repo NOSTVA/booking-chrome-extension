@@ -1,0 +1,1 @@
+import{getAppointments}from"../utils/api.js";chrome.runtime.onMessage.addListener(((n,t,o)=>"GET_APPOINTMENTS"===n.action?(getAppointments().then(o),!0):(console.log(`Unknown action: ${n.action}`),!1)));
