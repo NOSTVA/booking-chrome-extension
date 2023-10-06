@@ -22,8 +22,5 @@
     "default_popup": "popup.html"
   },
   "permissions": ["storage"],
-  "host_permissions": [
-    "https://booking-app-team.vercel.app/*",
-    "http://localhost:3000/*"
-  ]
+  "host_permissions": ["https://booking-app-team.vercel.app/*"]
 }
