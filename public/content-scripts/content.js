@@ -1,5 +1,9 @@
 /*global chrome*/
-const auto_fill = (appointment, [location, { typology, category, visa }]) => {
+
+const auto_fill = async (
+  appointment,
+  [location, { typology, category, visa }]
+) => {
   const visa_arr = appointment.applicants.map(() => visa);
   return select_location(location)
     .then(() => accept_terms())
@@ -20,7 +24,9 @@ chrome.runtime.onMessage.addListener(async (req, sender, res) => {
   const { action, appointment } = req;
   switch (action) {
     case "AUTO_FILL":
-      auto_fill(appointment, BUSINESS_CAIRO).then(() => res("ok!"));
+      auto_fill(appointment, visaEnums[appointment.visa]).then(() =>
+        res("ok!")
+      );
       return true;
     default:
       return false;

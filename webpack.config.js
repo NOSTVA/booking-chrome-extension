@@ -22,6 +22,11 @@ module.exports = {
           },
         },
       },
+      // Add a rule for CSS files
+      {
+        test: /\.css$/,
+        use: ["style-loader", "css-loader"],
+      },
     ],
   },
   plugins: [

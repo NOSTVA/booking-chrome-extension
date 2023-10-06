@@ -7,23 +7,20 @@ import {
   Flex,
   Spacer,
   StackDivider,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
   useDisclosure,
+  Button,
+  Box,
 } from "@chakra-ui/react";
-import { ArrowRightIcon, CheckIcon, HamburgerIcon } from "@chakra-ui/icons";
-import React from "react";
-import { autoFill, getAction, getTimeAgo } from "../functions";
-
-export default function Appointment({ appointment }) {
+import React, { useEffect, useState } from "react";
+import { autoFill, getAction } from "../functions";
+import { updateAppointement } from "../../public/utils/api";
+import Moment from "react-moment";
+export default function Appointment({ appointment: initApp }) {
+  const [appointment, setAppointment] = useState(initApp);
+  const date = getAction(_id);
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const { _id, applicants, email, phone, status, visa, expectedTravelDate } =
     appointment;
-  const date = getAction(_id);
-  const timeAgo = getTimeAgo(date) || "-";
-  const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <Card size="sm">
@@ -32,13 +29,13 @@ export default function Appointment({ appointment }) {
           <Flex spacing="4">
             <Flex flex="1" gap="4" alignItems="center" flexWrap="wrap">
               <Text color="twitter.400">{email} </Text>
-              <Text>{timeAgo || "-"} </Text>
             </Flex>
             <ActionsMenu
               onClose={onClose}
               isOpen={isOpen}
               onOpen={onOpen}
               appointment={appointment}
+              setAppointment={setAppointment}
             />
           </Flex>
 
@@ -86,27 +83,52 @@ export default function Appointment({ appointment }) {
   );
 }
 
-function ActionsMenu({ isOpen, onClose, onOpen, appointment }) {
-  return (
-    <Menu isLazy onClose={onClose} isOpen={isOpen}>
-      <MenuButton
-        onClick={onOpen}
-        as={IconButton}
-        aria-label="Options"
-        icon={<HamburgerIcon />}
-        size="xs"
-        variant="ghost"
-      />
+function ActionsMenu({ isOpen, onClose, onOpen, appointment, setAppointment }) {
+  const handleStatus = async (appointment, status) => {
+    const data = await updateAppointement(appointment._id, {
+      status,
+    });
+    setAppointment((prev) => ({
+      ...prev,
+      status: data.status,
+      updatedAt: data.updatedAt,
+      lastUpdatedBy: [data.lastUpdatedBy],
+    }));
+  };
 
-      <MenuList>
-        <MenuItem
-          icon={<ArrowRightIcon />}
-          onClick={() => autoFill(appointment)}
-        >
-          Auto Fill
-        </MenuItem>
-        <MenuItem icon={<CheckIcon />}>Set status complete</MenuItem>
-      </MenuList>
-    </Menu>
+  return (
+    <>
+      <Box>
+        <HStack mb={"10px"}>
+          <Button
+            size="xs"
+            onClick={() => autoFill(appointment)}
+            isDisabled={appointment.status == "complete"}
+          >
+            Auto fill
+          </Button>
+          <Button
+            size="xs"
+            onClick={async () => handleStatus(appointment, "complete")}
+            isDisabled={appointment.status == "complete"}
+          >
+            Set status complete
+          </Button>
+        </HStack>
+        <Stack>
+          <Button
+            size="xs"
+            onClick={async () => handleStatus(appointment, "pending")}
+            isDisabled={appointment.status == "pending"}
+          >
+            Set status pending
+          </Button>
+          <Moment fromNow>{appointment.updatedAt}</Moment>
+          <Text>
+            By {appointment.lastUpdatedBy[0]?.email?.split("@")[0] || "unkown"}
+          </Text>
+        </Stack>
+      </Box>
+    </>
   );
 }

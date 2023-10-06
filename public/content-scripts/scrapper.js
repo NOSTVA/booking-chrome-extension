@@ -154,7 +154,6 @@ const set_folder_inputs = (folderIndex, applicant) => {
 };
 
 const set_folders_visa = (visa_arr) => {
-  console.log(visa_arr);
   return visa_arr.reduce((previousPromise, visa, index) => {
     return previousPromise.then(() => {
       return set_folder_visa(index + 2, visa);

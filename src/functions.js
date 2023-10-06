@@ -15,7 +15,6 @@ function autoFill(appointment) {
       action: "AUTO_FILL",
       appointment,
     });
-    console.log(appointment._id);
     saveAction(appointment._id);
   });
 }

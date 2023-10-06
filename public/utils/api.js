@@ -1,4 +1,4 @@
-const BASE_QUERY = "https://booking-app-team.vercel.app/api/v2";
+const BASE_QUERY = "http://localhost:3000/api/v2";
 
 const getAppointments = async () => {
   try {
@@ -13,7 +13,7 @@ const getAppointments = async () => {
 const updateAppointement = async (appointmentId, payload) => {
   try {
     const options = {
-      method: "PUT",
+      method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },

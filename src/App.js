@@ -29,7 +29,8 @@ export default function App() {
         left={0}
         zIndex={2}
         py={2}
-        bg={useColorModeValue("white", "gray.800")}>
+        bg={useColorModeValue("white", "gray.800")}
+      >
         <Search
           value={term}
           onChange={setTerm}
