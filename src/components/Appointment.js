@@ -10,12 +10,16 @@ import {
   useDisclosure,
   Button,
   Box,
+  Checkbox,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { autoFill, getAction } from "../functions";
 import { updateAppointement } from "../../public/utils/api";
 import Moment from "react-moment";
 export default function Appointment({ appointment: initApp }) {
+  const storedColor = localStorage.getItem(initApp._id) === "done";
+  const [color, setColor] = useState(storedColor);
+
   const [appointment, setAppointment] = useState(initApp);
   const date = getAction(_id);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -23,7 +27,7 @@ export default function Appointment({ appointment: initApp }) {
     appointment;
 
   return (
-    <Card size="sm">
+    <Card size="sm" bg={color ? "red.900" : ""}>
       <CardBody>
         <Stack divider={<StackDivider />}>
           <Flex spacing="4">
@@ -36,6 +40,8 @@ export default function Appointment({ appointment: initApp }) {
               onOpen={onOpen}
               appointment={appointment}
               setAppointment={setAppointment}
+              color={color}
+              setColor={setColor}
             />
           </Flex>
 
@@ -83,7 +89,29 @@ export default function Appointment({ appointment: initApp }) {
   );
 }
 
-function ActionsMenu({ isOpen, onClose, onOpen, appointment, setAppointment }) {
+function ActionsMenu({
+  isOpen,
+  onClose,
+  onOpen,
+  appointment,
+  setAppointment,
+  handleSpecial,
+  color,
+  setColor,
+}) {
+  const storedColor = localStorage.getItem(appointment._id) === "done";
+  const [isChecked, setIsChecked] = useState(storedColor);
+
+  const handleCheckboxChange = () => {
+    if (isChecked) {
+      localStorage.removeItem(appointment._id);
+      setColor(false);
+    } else {
+      localStorage.setItem(appointment._id, "done");
+      setColor(true);
+    }
+    setIsChecked(!isChecked);
+  };
   const handleStatus = async (appointment, status) => {
     const data = await updateAppointement(appointment._id, {
       status,
@@ -95,7 +123,10 @@ function ActionsMenu({ isOpen, onClose, onOpen, appointment, setAppointment }) {
       lastUpdatedBy: [data.lastUpdatedBy],
     }));
   };
-
+  useEffect(() => {
+    const items = localStorage.getItem(appointment._id);
+    setIsChecked(!!items);
+  }, [appointment._id]);
   return (
     <>
       <Box>
@@ -123,6 +154,10 @@ function ActionsMenu({ isOpen, onClose, onOpen, appointment, setAppointment }) {
           >
             Set status pending
           </Button>
+          <Checkbox isChecked={isChecked} onChange={handleCheckboxChange}>
+            Make it special
+          </Checkbox>
+
           <Moment fromNow>{appointment.updatedAt}</Moment>
           <Text>
             By {appointment.lastUpdatedBy[0]?.email?.split("@")[0] || "unkown"}
