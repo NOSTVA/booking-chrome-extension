@@ -160,7 +160,8 @@ function ActionsMenu({
 
           <Moment fromNow>{appointment.updatedAt}</Moment>
           <Text>
-            By {appointment.lastUpdatedBy[0]?.email?.split("@")[0] || "unkown"}
+            By{" "}
+            {appointment.lastUpdatedBy?.[0]?.email?.split("@")[0] || "unkown"}
           </Text>
         </Stack>
       </Box>
